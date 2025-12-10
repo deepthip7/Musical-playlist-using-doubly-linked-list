@@ -1,0 +1,73 @@
+package playlist_backend;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+
+public class Main {
+
+    static Playlist playlist = new Playlist();
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("🚀 Server running at: http://localhost:8080");
+
+        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+
+        // Enable CORS for all requests
+        server.createContext("/", exchange -> {
+            addCorsHeaders(exchange);
+            if ("OPTIONS".equals(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+                return;
+            }
+        });
+
+        server.createContext("/add", exchange -> {
+            addCorsHeaders(exchange);
+            String song = exchange.getRequestURI().getQuery().replace("name=", "");
+            playlist.addSong(song);
+            send(exchange, "Song added: " + song);
+        });
+
+        server.createContext("/remove", exchange -> {
+            addCorsHeaders(exchange);
+            String song = exchange.getRequestURI().getQuery().replace("name=", "");
+            playlist.removeSong(song);
+            send(exchange, "Song removed: " + song);
+        });
+
+        server.createContext("/next", exchange -> {
+            addCorsHeaders(exchange);
+            playlist.playNext();
+            send(exchange, "Now Playing: " + playlist.getCurrentSong());
+        });
+
+        server.createContext("/prev", exchange -> {
+            addCorsHeaders(exchange);
+            playlist.playPrevious();
+            send(exchange, "Now Playing: " + playlist.getCurrentSong());
+        });
+
+        server.createContext("/list", exchange -> {
+            addCorsHeaders(exchange);
+            send(exchange, playlist.getPlaylist());
+        });
+
+        server.start();
+    }
+
+    private static void addCorsHeaders(HttpExchange exchange) {
+        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "*");
+    }
+
+    private static void send(HttpExchange exchange, String response) throws IOException {
+        exchange.sendResponseHeaders(200, response.length());
+        OutputStream os = exchange.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
+    }
+}

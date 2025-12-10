@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>🎵 Song Playlist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🎧 My Music Playlist</h1>
+    <p class="subtitle">Add, play and manage your songs</p>
+
+    <div class="input-box">
+        <input id="songInput" placeholder="Enter song name...">
+        <button class="add" onclick="addSong()">＋ Add</button>
+    </div>
+
+    <div class="controls">
+
+        <button onclick="removeSong()">🗑 Remove</button>
+        <button onclick="prevSong()">⏮ Previous</button>
+        <button onclick="nextSong()">⏭ Next</button>
+        <button class="show" onclick="showPlaylist()">📃 Show Playlist</button>
+    </div>
+
+    <h3>📝 Playlist:</h3>
+    <textarea id="output" readonly></textarea>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
